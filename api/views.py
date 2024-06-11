@@ -6,7 +6,7 @@ from django.shortcuts import render, get_object_or_404
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import RateSerializer
+from .serializers import RateSerializer, GetRateSerializer
 from .models import Rate
 
 
@@ -44,7 +44,7 @@ class GetRate(APIView):
             return Response({"error": "invalid date format"}, status=status.HTTP_400_BAD_REQUEST)
 
         rate = get_object_or_404(Rate, Date=date_obj, Cur_Abbreviation=curr_code)
-        data = RateSerializer(rate).data
+        data = GetRateSerializer(rate).data
 
         previous_day = date_obj - datetime.timedelta(days=1)
         prev_rate = Rate.objects.filter(Date=previous_day, Cur_Abbreviation=curr_code).first()
