@@ -20,11 +20,11 @@ class FetchRates(APIView):
             serializer = RateSerializer(data=response_data, many=True)
             if serializer.is_valid():
                 serializer.save()
-                return Response(status=status.HTTP_201_CREATED)
+                return Response(data={'message': 'success'}, status=status.HTTP_201_CREATED)
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response(status=response.status_code)
+            return Response(data={'message': 'failed'}, status=response.status_code)
 
 
 class GetRate(APIView):
