@@ -44,6 +44,18 @@ class GetRate(APIView):
             return Response({"error": "invalid date format"}, status=status.HTTP_400_BAD_REQUEST)
 
         rate = get_object_or_404(Rate, Date=date_obj, Cur_Abbreviation=curr_code)
-        serializer = RateSerializer(rate)
+        data = RateSerializer(rate).data
 
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        previous_day = date_obj - datetime.timedelta(days=1)
+        prev_rate = Rate.objects.filter(Date=previous_day, Cur_Abbreviation=curr_code).first()
+
+        if prev_rate:
+            if prev_rate.Cur_OfficialRate > rate.Cur_OfficialRate:
+                change_status = 'Decreased'
+            else:
+                change_status = 'Increased'
+            data['Change_From_Previous_Day'] = change_status
+        else:
+            data['Change_From_Previous_Day'] = "No data about previous day"
+
+        return Response(data, status=status.HTTP_200_OK)
